@@ -75,7 +75,7 @@ class AppDB(context: Context) {
                     dateCreated = Date(),
                     dateUsed = Date(),
                     llmModelId = llmModelId,
-                    contextSize = 2048,
+                    contextSize = 16384,
                     chatTemplate = chatTemplate,
                     isTask = isTask,
                 )

@@ -131,7 +131,7 @@ class DownloadModelsViewModel(
                 val ggufReader = GGUFReader()
                 ggufReader.load(File(context.filesDir, fileName).absolutePath)
                 val contextSize =
-                    ggufReader.getContextSize() ?: SmolLM.DefaultInferenceParams.contextSize
+                    ggufReader.getContextSize() ?: 16384L
                 val chatTemplate =
                     ggufReader.getChatTemplate() ?: SmolLM.DefaultInferenceParams.chatTemplate
                 appDB.addModel(

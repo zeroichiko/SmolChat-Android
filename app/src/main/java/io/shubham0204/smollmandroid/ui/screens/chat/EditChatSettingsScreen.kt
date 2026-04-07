@@ -99,7 +99,8 @@ data class EditableChatSettings(
         existingChat.temperature = temperature
         existingChat.contextSize = contextSize
         existingChat.nThreads = nThreads
-        existingChat.chatTemplate = chatTemplate
+        // FIX: Never override chatTemplate from EditSettings - it should come from GGUF model
+        // The template is managed by loadModel() which uses the model's default if needed
         existingChat.useMmap = useMmap
         existingChat.useMlock = useMlock
         return existingChat
@@ -132,7 +133,9 @@ fun EditChatSettingsScreen(
     var contextSize by remember { mutableIntStateOf(settings.contextSize) }
     var nThreads by remember { mutableIntStateOf(settings.nThreads) }
     var takeContextSizeFromModel by remember { mutableStateOf(false) }
-    var chatTemplate by remember { mutableStateOf(settings.chatTemplate) }
+    // FIX: Track original chatTemplate separately - do not allow user to modify it
+    // The chat template should come from the GGUF model, not be editable in UI
+    val originalChatTemplate = settings.chatTemplate
     var useMmap by remember { mutableStateOf(settings.useMmap) }
     var useMlock by remember { mutableStateOf(settings.useMlock) }
     val context = LocalContext.current
@@ -158,8 +161,10 @@ fun EditChatSettingsScreen(
                                         minP = minP,
                                         temperature = temperature,
                                         contextSize = contextSize,
-                                        chatTemplate = chatTemplate,
                                         nThreads = nThreads,
+                                        // FIX: Always preserve original chatTemplate - it should come from GGUF model
+                                        // User modifications to other settings should not affect the template
+                                        chatTemplate = originalChatTemplate,
                                         useMmap = useMmap,
                                         useMlock = useMlock,
                                     )
@@ -218,18 +223,22 @@ fun EditChatSettingsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                TextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = chatTemplate,
-                    onValueChange = { chatTemplate = it },
-                    label = { Text("Chat template") },
-                    keyboardOptions =
-                        KeyboardOptions.Default.copy(
-                            capitalization = KeyboardCapitalization.Sentences
-                        ),
-                    maxLines = 5,
+                // FIX: Chat template is now read-only - it comes from the GGUF model
+                // Users should not modify this as it can cause "System message cannot contain images" errors
+                Text(
+                    text = "Chat Template (from model)",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = if (originalChatTemplate.isNotBlank()) {
+                        "Using model's default template for multimodal support"
+                    } else {
+                        "No custom template - will use GGUF metadata"
+                    },
+                    style = MaterialTheme.typography.labelSmall,
                 )
 
+                Spacer(modifier = Modifier.height(24.dp))
                 Spacer(modifier = Modifier.height(8.dp))
 
                 if (settings.isTask) {
@@ -341,8 +350,8 @@ fun EditChatSettingsScreen(
                 Slider(
                     value = nThreads.toFloat(),
                     onValueChange = { nThreads = it.toInt() },
-                    valueRange = 0.0f..(totalThreads).toFloat(),
-                    steps = totalThreads,
+                    valueRange = 1.0f..(totalThreads).toFloat(), // FIX: Start from 1, not 0!
+                    steps = totalThreads - 1,
                 )
                 Text(text = "$nThreads", style = MaterialTheme.typography.labelSmall)
 

@@ -58,9 +58,12 @@ LLMInference::loadModel(const char *model_path, float minP, float temperature, b
     _formattedMessages = std::vector<char>(llama_n_ctx(_ctx));
     _messages.clear();
 
-    if (chatTemplate == nullptr) {
+    // FIX: Treat empty string as nullptr to use model's default chat template
+    if (chatTemplate == nullptr || strlen(chatTemplate) == 0) {
+        LOGi("Using model's default chat template");
         _chatTemplate = llama_model_chat_template(_model, nullptr);
     } else {
+        LOGi("Using custom chat template: %s", chatTemplate);
         _chatTemplate = strdup(chatTemplate);
     }
     this->_storeChats = storeChats;
@@ -91,11 +94,24 @@ LLMInference::startCompletion(const char *query) {
     _responseNumTokens = 0;
     addChatMessage(query, "user");
     // apply the chat-template
+    // IMPORTANT: system messages must always be plain text strings (no image blocks)
     std::vector<common_chat_msg> messages;
     for (const llama_chat_message& message : _messages) {
         common_chat_msg msg;
-        msg.role    = message.role;
-        msg.content = message.content;
+        msg.role    = message.role ? message.role : "";
+        
+        // For system role: ALWAYS use plain string content, NEVER typed/blocks format
+        if (msg.role == "system") {
+            msg.content = message.content ? std::string(message.content) : "";
+            msg.content_parts.clear();  // Force empty - no blocks for system!
+            msg.reasoning_content.clear();
+            msg.tool_calls.clear();
+            msg.tool_name.clear();
+            msg.tool_call_id.clear();
+        } else {
+            // User/assistant messages may have typed content for multimodal support
+            msg.content = message.content ? std::string(message.content) : "";
+        }
         messages.push_back(msg);
     }
     common_chat_templates_inputs inputs;

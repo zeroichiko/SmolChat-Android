@@ -126,9 +126,9 @@ class SmolLM {
      * file.
      */
     object DefaultInferenceParams {
-        val contextSize: Long = 1024L
+        val contextSize: Long = 16384L
         val chatTemplate: String =
-            "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system You are a helpful AI assistant named SmolLM, trained by Hugging Face<|im_end|> ' }}{% endif %}{{'<|im_start|>' + message['role'] + ' ' + message['content'] + '<|im_end|>' + ' '}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant ' }}{% endif %}"
+            "{%- for message in messages -%}\n{%- if message['role'] == 'system' -%}\n    {%- if message['content'] is string -%}\n        {{- '</think>system\n' + message['content'] + '</think>' }}\n    {%- elif message['content'] | length > 0 -%}\n        {# CRITICAL FIX: system prompt must always be plain text, extract first block if array #}\n        {{- '</think>system\n' + (message['content'][0]['text'] if message['content'][0]['type'] == 'text' else '') + '</think>' }}\n    {%- endif -%}\n{%- elif message['role'] == 'user' -%}\n    {%- if message['content'] is string -%}\n        {{- '</think>user\n' + message['content'] + '</think>' }}\n    {%- else -%}\n        {%- for block in message['content'] -%}\n            {%- if block['type'] == 'text' -%}\n                {{- block['text'] }}\n            {%- elif block['type'] in ['image', 'image_url'] -%}\n                {{- '[IMG]' }}\n            {%- else -%}\n                {{- '' }}\n            {%- endif -%}\n        {%- endfor -%}\n    {%- endif -%}\n{%- elif message['role'] == 'assistant' -%}\n    {%- if message['content'] is string -%}\n        {{- '</think>assistant\n' + message['content'] + '</think>' }}\n    {%- else -%}\n        {%- for block in message['content'] -%}\n            {%- if block['type'] == 'text' -%}\n                {{- block['text'] }}\n            {%- elif block['type'] in ['image', 'image_url'] -%}\n                {{- '[IMG]' }}\n            {%- else -%}\n                {{- '' }}\n            {%- endif -%}\n        {%- endfor -%}\n    {%- endif -%}\n{%- endif -%}\n{%- endfor -%}\n{%- if add_generation_prompt -%}\n    {{- '</think>assistant\n' }}\n{%- endif -%}"
     }
 
     /**

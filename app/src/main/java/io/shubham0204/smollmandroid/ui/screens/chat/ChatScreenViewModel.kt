@@ -199,6 +199,20 @@ class ChatScreenViewModel(
         if (chat.llmModelId == -1L) {
             _uiState.update { it.copy(showSelectModelListDialog = true) }
         } else {
+            // FIX: Use model's contextSize if chat.contextSize is invalid (0 or negative)
+            val effectiveContextSize = if (chat.contextSize <= 0) model.contextSize.toLong() else chat.contextSize.toLong()
+            
+            // FIX: Ensure nThreads >= 1 (llama.cpp requires at least 1 thread)
+            val safeNThreads = maxOf(1, chat.nThreads)
+            
+            // FIX: Always use model's chatTemplate - it contains the correct Jinja2 template for multimodal support
+            // Chat-level template should only be used if user explicitly set a valid custom template (rare case)
+            val effectiveChatTemplate = model.chatTemplate.takeIf { 
+                it.isNotBlank() && ("{%" in it || "{{" in it) 
+            } ?: chat.chatTemplate.takeIf { 
+                it.isNotBlank() && ("{%" in it || "{{" in it) 
+            } ?: ""
+
             _uiState.update { it.copy(modelLoadingState = ModelLoadingState.IN_PROGRESS) }
             smolLMManager.load(
                 chat,
@@ -207,9 +221,9 @@ class ChatScreenViewModel(
                     chat.minP,
                     chat.temperature,
                     !chat.isTask,
-                    chat.contextSize.toLong(),
-                    chat.chatTemplate.takeIf { it.isNotBlank() && ("{%" in it || "{{" in it) },
-                    chat.nThreads,
+                    effectiveContextSize,
+                    effectiveChatTemplate,
+                    safeNThreads,
                     chat.useMmap,
                     chat.useMlock,
                 ),

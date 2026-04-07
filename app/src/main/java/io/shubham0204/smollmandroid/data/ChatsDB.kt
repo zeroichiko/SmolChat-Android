@@ -85,7 +85,7 @@ data class Chat(
      * users in the EditChatSettingsScreen.kt. Its initial value is taken from the GGUF model
      * selected by the user.
      */
-    var contextSize: Int = 0,
+    var contextSize: Int = 16384, // Default to a reasonable value; will be overridden when model is selected
     /** The number of tokens that have been used as context in the current chat session */
     var contextSizeConsumed: Int = 0,
     /**
