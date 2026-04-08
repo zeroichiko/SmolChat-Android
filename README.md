@@ -2,6 +2,9 @@
 
 # SmolChat - On-Device Inference of SLMs in Android
 
+> **Note:** This project is a fork of [shubham0204/SmolChat-Android](https://github.com/shubham0204/SmolChat-Android).
+
+
 <table>
 <tr>
 <td>
@@ -37,7 +40,7 @@
 
 ### GitHub
 
-1. Download the latest APK from [GitHub Releases](https://github.com/shubham0204/SmolChat-Android/releases/) and transfer it to your Android device.
+1. Download the latest APK from [GitHub Releases](https://github.com/zeroichiko/SmolChat-Android/releases/) and transfer it to your Android device.
 2. If your device does not downloading APKs from untrusted sources, search for **how to allow downloading APKs from unknown sources** for your device.
 
 ### Obtainium
@@ -46,7 +49,7 @@
 
 1. [Download the Obtainium app](https://obtainium.imranr.dev/) by choosing your device architecture or 'Download Universal APK'.
 2. From the bottom menu, select '➕Add App'
-3. In the text field labelled 'App source URL *', enter the following URL and click 'Add' besides the text field: `https://github.com/shubham0204/SmolChat-Android`
+3. In the text field labelled 'App source URL *', enter the following URL and click 'Add' besides the text field: `https://github.com/zeroichiko/SmolChat-Android`
 4. SmolChat should now be visible in the 'Apps' screen. You can get notifications about newer releases and download them directly without going to the GitHub repo.
 
 ## Project Goals
@@ -62,7 +65,7 @@
 1. Clone the repository with its submodule originating from llama.cpp,
 
 ```commandline
-git clone --depth=1 https://github.com/shubham0204/SmolChat-Android
+git clone --depth=1 https://github.com/zeroichiko/SmolChat-Android
 cd SmolChat-Android
 git submodule update --init --recursive
 ```
