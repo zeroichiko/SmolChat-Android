@@ -2,7 +2,7 @@
 
 # SmolChat - On-Device Inference of SLMs in Android
 
-> **Note:** This project is a fork of [shubham0204/SmolChat-Android](https://github.com/shubham0204/SmolChat-Android).
+> **Note:** This project is a fork of [shubham0204/SmolChat-Android](https://github.com/shubham0204/SmolChat-Android) for using Qwen3.5 with NPU. 
 
 
 <table>
