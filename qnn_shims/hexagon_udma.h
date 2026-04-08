@@ -1,0 +1,10 @@
+#ifndef HEXAGON_UDMA_H
+#define HEXAGON_UDMA_H
+
+#include "hexagon_types.h"
+
+#define HEXAGON_UDMA_DESC_DESCTYPE_TYPE1 0x1
+#define HEXAGON_UDMA_DESC_DSTATE_INCOMPLETE 0x0
+#define HEXAGON_UDMA_DESC_DSTATE_COMPLETE 0x1
+
+#endif
