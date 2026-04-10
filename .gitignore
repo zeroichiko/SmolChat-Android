@@ -11,3 +11,8 @@ local.properties
 .kotlin
 ktlint
 ktlint.bat
+
+# APK files (too large for GitHub)
+*.apk
+*.idsig
+*.jks
